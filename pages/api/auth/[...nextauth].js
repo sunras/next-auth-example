@@ -1,5 +1,15 @@
 import NextAuth from "next-auth"
 import Providers from "next-auth/providers"
+import * as Fauna from "faunadb"
+import { FaunaAdapter } from "@next-auth/fauna-adapter"
+
+const client = new Fauna.Client({
+  secret: process.env.FAUNA_SERVER_SECRET,
+  scheme: "https",
+  domain: "db.fauna.com",
+  port: 443,
+  // port: 8443,
+})
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
@@ -47,6 +57,7 @@ export default NextAuth({
       domain: process.env.AUTH0_DOMAIN,
     }),
   ],
+  adapter: FaunaAdapter({ faunaClient: client}),
   // Database optional. MySQL, Maria DB, Postgres and MongoDB are supported.
   // https://next-auth.js.org/configuration/databases
   //
@@ -110,6 +121,16 @@ export default NextAuth({
     // async redirect(url, baseUrl) { return baseUrl },
     // async session(session, user) { return session },
     // async jwt(token, user, account, profile, isNewUser) { return token }
+    async jwt(token, user) {
+     if (user?.id) token.id = user.id;
+     if (user?.roles) token.roles = user.roles;
+     return token;
+     },
+     async session(session, token) {
+         if (token?.id) session.user.id = token.id;
+         if (token?.roles) session.user.roles = token.roles;
+         return session;
+     }
   },
 
   // Events are useful for logging
