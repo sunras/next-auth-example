@@ -17,9 +17,16 @@ export default function Header () {
         <p className={`nojs-show ${(!session && loading) ? styles.loading : styles.loaded}`}>
           {!session && <>
             <span className={styles.notSignedInText}>You are not signed in</span>
-              <Link href="/signin">
-              <a className={styles.buttonPrimary}>  Sign in</a>
-            </Link>
+            <a
+                href={`/api/auth/signin`}
+                className={styles.button}
+                onClick={(e) => {
+                  e.preventDefault()
+                  signIn()
+                }}
+              >
+                Sign in
+              </a>
           </>}
           {session && <>
             {session.user.image && <span style={{backgroundImage: `url(${session.user.image})` }} className={styles.avatar}/>}
