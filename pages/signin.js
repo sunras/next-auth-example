@@ -1,19 +1,24 @@
 import { signIn } from "next-auth/client"
+import { useState } from "react";
 
-export default function SignIn() {
+export default function SignIn({ csrfToken }) {
+  const [email, setEmail] = useState("");
+
   const handleSubmit = (event) => {
-      event.preventDefault();
-      console.log('test');
-      signIn("email", { email, callbackUrl: '/protected' });
-  };
-
+    event.preventDefault();
+    console.log('The name you entered was: ' +email)
+    signIn("email", { email: email })
+  }
 
   return (
     <form onSubmit={handleSubmit}>
-      <label>
-        Email address
-        <input type="email" id="email" name="email" />
-      </label>
+      <label>Email address:
+          <input
+            type="text"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </label>
       <button type="submit">Sign in with Email</button>
     </form>
   )

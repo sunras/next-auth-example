@@ -1,12 +1,13 @@
 import NextAuth from "next-auth"
 import Providers from "next-auth/providers"
 import * as Fauna from "faunadb"
-import { FaunaAdapter } from "@next-auth/fauna-adapter"
+// import { FaunaAdapter } from "@next-auth/fauna-adapter"
+import { FaunaAdapter } from "../../../api/fauna-adapter"
 
 const client = new Fauna.Client({
   secret: process.env.FAUNA_SERVER_SECRET,
   scheme: "https",
-  domain: "db.fauna.com",
+  domain: "db.eu.fauna.com",
   port: 443,
   // port: 8443,
 })
@@ -106,7 +107,7 @@ export default NextAuth({
   // pages is not specified for that route.
   // https://next-auth.js.org/configuration/pages
   pages: {
-    signIn: '/api/auth/signin',  // Displays signin buttons
+    signIn: '/signin',  // Displays signin buttons
     // signOut: '/auth/signout', // Displays form with sign out button
     // error: '/auth/error', // Error code passed in query string as ?error=
     // verifyRequest: '/auth/verify-request', // Used for check email page
@@ -121,16 +122,16 @@ export default NextAuth({
     // async redirect(url, baseUrl) { return baseUrl },
     // async session(session, user) { return session },
     // async jwt(token, user, account, profile, isNewUser) { return token }
-    // async jwt(token, user) {
-    //  if (user?.id) token.id = user.id;
-    //  if (user?.roles) token.roles = user.roles;
-    //  return token;
-    //  },
-    //  async session(session, token) {
-    //      if (token?.id) session.user.id = token.id;
-    //      if (token?.roles) session.user.roles = token.roles;
-    //      return session;
-    //  }
+    async jwt(token, user) {
+     if (user?.id) token.id = user.id;
+     if (user?.roles) token.roles = user.roles;
+     return token;
+     },
+     async session(session, token) {
+         if (token?.id) session.user.id = token.id;
+         if (token?.roles) session.user.roles = token.roles;
+         return session;
+     }
   },
 
   // Events are useful for logging
@@ -142,5 +143,5 @@ export default NextAuth({
   theme: 'light',
 
   // Enable debug messages in the console if you are having problems
-  debug: false,
+  debug: true,
 })
